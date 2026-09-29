@@ -31,19 +31,19 @@ status: design-only (implementation pending approval)
 
 ## 2. Stack
 
-| Layer | Choice | Why |
-|---|---|---|
-| **Agent framework** | [eve.dev](https://eve.dev) | Durable agent framework; "like Next.js for agents"; supports skills (Markdown playbooks), tools (TypeScript), sandbox (isolated execution), channels (Slack/Teams/web), connections (auth) |
-| **LLM backend** | MiniMax | For long-context document ingestion and synthesis |
-| **Frontend** | Next.js + Tailwind + shadcn/ui on Vercel | Canonical Vercel stack |
-| **Backend API** | Vercel serverless functions (orchestrating eve agents) | Stateless, scales, deploys via Vercel |
-| **Data store** | MongoDB Atlas | Document model fits case files; agents share state |
-| **Vector store** | Pinecone serverless | Embeddings for citation lookup and RAG |
-| **File storage** | S3 (or Vercel Blob) | Versioned snapshots of source documents |
-| **OCR** | TBD (AWS Textract / Google Document AI / Tesseract) | For image-based PDFs (e.g., some audit reports) |
-| **Auth** | Corporate SSO (Okta / Azure AD) | Single-tenant HKbitEX |
-| **CI/CD** | GitHub Actions + Vercel auto-deploy | Standard |
-| **Observability** | OpenTelemetry + structured logs | Cost-per-case dashboards |
+| Layer               | Choice                                                 | Why                                                                                                                                                                                        |
+| ------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Agent framework** | [eve.dev](https://eve.dev)                             | Durable agent framework; "like Next.js for agents"; supports skills (Markdown playbooks), tools (TypeScript), sandbox (isolated execution), channels (Slack/Teams/web), connections (auth) |
+| **LLM backend**     | MiniMax                                                | For long-context document ingestion and synthesis                                                                                                                                          |
+| **Frontend**        | Next.js + Tailwind + shadcn/ui on Vercel               | Canonical Vercel stack                                                                                                                                                                     |
+| **Backend API**     | Vercel serverless functions (orchestrating eve agents) | Stateless, scales, deploys via Vercel                                                                                                                                                      |
+| **Data store**      | MongoDB Atlas                                          | Document model fits case files; agents share state                                                                                                                                         |
+| **Vector store**    | Pinecone serverless                                    | Embeddings for citation lookup and RAG                                                                                                                                                     |
+| **File storage**    | S3 (or Vercel Blob)                                    | Versioned snapshots of source documents                                                                                                                                                    |
+| **OCR**             | TBD (AWS Textract / Google Document AI / Tesseract)    | For image-based PDFs (e.g., some audit reports)                                                                                                                                            |
+| **Auth**            | Corporate SSO (Okta / Azure AD)                        | Single-tenant HKbitEX                                                                                                                                                                      |
+| **CI/CD**           | GitHub Actions + Vercel auto-deploy                    | Standard                                                                                                                                                                                   |
+| **Observability**   | OpenTelemetry + structured logs                        | Cost-per-case dashboards                                                                                                                                                                   |
 
 ## 3. The three document categories (per your spec)
 

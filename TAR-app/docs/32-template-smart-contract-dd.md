@@ -15,9 +15,140 @@ last_reviewed: 2026-09-29
 ## How to use
 
 1. One report per audit engagement
-2. Vendor completes Part A; HKbitEX R&D team completes Part B response; Head of Listing signs off Part C
-3. Stored in the case file for the admitted VA
-4. Versioned per `42-ai-agent-document-versioning.md`; 7-year retention
+2. **Before Part A:** complete the **Audit Path Selection** section below (Path A vs Path B) — this is mandatory and gates the entire report
+3. Vendor completes Part A; HKbitEX R&D team completes Part B response; Head of Listing signs off Part C
+4. Stored in the case file for the admitted VA
+5. Versioned per `42-ai-agent-document-versioning.md`; 7-year retention
+
+---
+
+## Audit Path Selection (Path A vs Path B)
+
+> **Why this section is first.** HKbitEX TAP §3.4 and SFC VATP Guidelines §7.10 [CIT-SFC-G-010] both give HKbitEX two valid paths for the smart-contract audit. The path must be selected and documented before the audit report can be accepted.
+
+### Source: SFC VATP Guidelines §7.10 (verbatim) — [CIT-SFC-G-010]
+
+> "Before admitting any virtual assets for trading, a Platform Operator should exercise due skill, care and diligence in selecting and appointing an independent assessor to conduct a smart contract audit for smart-contract based virtual assets, **unless the Platform Operator demonstrates that it would be reasonable to rely on a smart contract audit conducted by an independent assessor engaged by a third party**. The smart contract audit should focus on reviewing that the smart contract is not subject to any contract vulnerabilities or security flaws to a high level of confidence."
+
+### Source: HKbitEX TAP §3.4 (verbatim)
+
+> "Exercise due skill, care and diligence in selecting and appointing an independent assessor to conduct a smart contract audit for smart contract based Virtual Assets, **unless the Company demonstrates that it would be reasonable to rely on a smart contract audit conducted by an independent auditor assessor engaged by a third party**. The smart contract audit should focus on reviewing that the smart contract is not subject to any contract vulnerabilities or security flaws to a high level of confidence."
+
+### Decision tree
+
+```
+                  ┌───────────────────────────────────────┐
+                  │   Smart contract exists for the VA    │
+                  └─────────────┬─────────────────────────┘
+                                │
+                ┌───────────────┴────────────────┐
+                │                                │
+                ▼                                ▼
+   ┌───────────────────────────┐    ┌──────────────────────────────────┐
+   │ Path A                    │    │ Path B                           │
+   │ HKbitEX engages its own   │    │ HKbitEX relies on a third-      │
+   │ independent assessor      │    │ party audit (engaged by Issuer    │
+   │                           │    │ / dev team / community)          │
+   └────────────┬──────────────┘    └────────────────┬─────────────────┘
+                │                                     │
+                ▼                                     ▼
+   Per CIT-SFC-G-010 + TAP §3.4:        Per CIT-SFC-G-010 + TAP §3.4:
+   - HKbitEX selects + appoints         - DEMONSTRATE reasonableness
+   - HKbitEX exercises due skill,       - Auditor must still be independent
+     care, diligence                   - Audit must still focus on
+   - Audit focuses on vulnerabilities      vulnerabilities to high
+     to high confidence                  confidence
+
+   (Default path when no third-party audit exists)
+```
+
+### Path A — HKbitEX engages its own independent assessor
+
+When to use:
+
+- No third-party audit exists yet
+- Third-party audit exists but fails the Path B acceptance criteria (§B below)
+- The VA's smart contract is materially complex / novel / high-value (Path A preferred for risk concentration)
+
+| Step | Owner | Action |
+|---|---|---|
+| 1 | R&D | Identify needed expertise (chain, language, domain) |
+| 2 | R&D | Shortlist 2+ qualified auditors (vendor DD per GAP-AUDIT-002 in `40-…` §5.9.1) |
+| 3 | R&D + Legal | Issue RFP; evaluate proposals; check independence |
+| 4 | R&D | Complete mandatory vendor DD (GAP-AUDIT-003) |
+| 5 | Head of Listing | Risk assessment + approval (Low / Medium / High risk rating) |
+| 6 | Legal + R&D | Contract execution (NDA + audit contract + re-audit terms) |
+| 7 | R&D | Engagement management; receive findings |
+| 8 | R&D + Head of Listing | Acceptance decision per §B.2 (severity-gated; GAP-AUDIT-004) |
+
+### Path B — HKbitEX relies on a third-party audit
+
+When to use:
+
+- A third-party audit already exists (engaged by Issuer / dev team / grant program / community)
+- The audit meets Path B acceptance criteria (below)
+
+**Path B acceptance criteria** (all six must be satisfied for HKbitEX to rely):
+
+| # | Criterion | Evidence required | Source |
+|---|---|---|---|
+| 1 | **Auditor independence** | Auditor is independent of the Issuer / dev team (no equity, no prior engagement, no current business relationship) | SFC §7.10; HKbitEX TAP §3.4 |
+| 2 | **Auditor competence** | Vendor DD passes per `12-policy-smart-contract-audit-vendor.md` §5 (GAP-AUDIT-001) | SFC §7.10; HKbitEX TAP §3.4 |
+| 3 | **Scope match** | The third-party audit covers the exact smart contract(s) HKbitEX is admitting (not a subset, not an older version) | SFC §7.10 |
+| 4 | **Methodology** | Audit combined automated tooling + expert manual review (not just an automated scan) | SFC §7.10 |
+| 5 | **Severity classification** | Findings classified Critical / High / Medium / Low / Informational with clear remediation guidance | HKbitEX TAP §3.4 |
+| 6 | **Freshness** | Audit date within 6 months (or re-audit / auditor sign-off that prior audit still applies) | Operational best practice |
+
+**What "demonstrates it is reasonable" means** — HKbitEX must keep an **audit-reliance log** with:
+
+| Log field | Value |
+|---|---|
+| VA name | |
+| Third-party auditor name | |
+| Audit date | |
+| Scope coverage | |
+| Independence evidence | |
+| Vendor DD score (per `12-policy-smart-contract-audit-vendor.md`) | |
+| Path B criteria 1–6 pass/fail | |
+| R&D reviewer + sign-off | |
+| Head of Listing sign-off | |
+| Decision | APPROVE Path B / DECLINE → fall back to Path A |
+
+### When Path B fails — fall back to Path A
+
+If any of the six acceptance criteria fails:
+
+- HKbitEX declines to rely on the third-party audit
+- HKbitEX engages its own independent assessor (Path A) before admission
+- Decline reason + supporting evidence filed in the case file (7-year retention)
+- Issuer informed; given opportunity to commission a new audit that meets criteria
+
+### Audit Path Selection record (fill in for every admission)
+
+| Field | Value |
+|---|---|
+| **VA** | |
+| **Application Reference** | |
+| **Selection date** | |
+| **Path chosen** | A (HKbitEX-engaged) / B (third-party reliance) |
+| **If A — HKbitEX-selected auditor** | |
+| **If A — vendor DD score** | Low / Medium / High |
+| **If A — engagement contract reference** | |
+| **If B — third-party auditor** | |
+| **If B — Path B criterion 1 (independence)** | Pass / Fail |
+| **If B — Path B criterion 2 (competence / vendor DD)** | Pass / Fail |
+| **If B — Path B criterion 3 (scope match)** | Pass / Fail |
+| **If B — Path B criterion 4 (methodology)** | Pass / Fail |
+| **If B — Path B criterion 5 (severity classification)** | Pass / Fail |
+| **If B — Path B criterion 6 (freshness)** | Pass / Fail |
+| **If B — audit-reliance log entry ID** | |
+| **R&D reviewer name + sign-off** | |
+| **Head of Listing sign-off** | |
+| **Decision** | APPROVE / DECLINE (→ Path A) |
+
+---
+
+# Smart Contract Audit Report — DD Summary
 
 ---
 
