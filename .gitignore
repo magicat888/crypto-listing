@@ -1,0 +1,37 @@
+# OS junk
+.DS_Store
+Thumbs.db
+._*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Local env
+.env
+.env.local
+
+# Secrets (placeholder)
+secrets/
+
+# HKbitEX-internal content (kept in private repo only)
+TAR-app/docs/01-listing-rules-v3.1.md
+TAR-app/docs/02-token-admission-policies-and-procedures-v1.0.md
+TAR-app/docs/03-monthly-report-head-of-listing.md
+TAR-app/docs/04-lc-meeting-minutes-2026-09-03.md
+TAR-app/docs/05-monthly-report-template.md
+TAR-app/docs/06-ongoing-monitoring-of-each-admitted-va.md
+TAR-app/docs/07-review-of-information-sources-on-dd.md
+TAR-app/scratch/
+reference/
