@@ -191,9 +191,9 @@ For each finding tracked through the lifecycle:
 - HKbitEX Listing Rules LR 2.2 — Smart Contract Audit factor
 - HKbitEX TAP §3.4 — smart contract audit requirement
 - [CIT-SFC-G-010] SFC VATP Guidelines §7.10 — independent-assessor requirement
-- `20-procedure-token-admission.md` — when audit is required
-- `23-procedure-ongoing-monitoring.md` — periodic re-audit trigger
-- `22-procedure-incident-escalation.md` — incident-driven re-audit
+- `20-procedure-token-admission.md` — when audit is required (see live gap log)
+- `23-procedure-ongoing-monitoring.md` — periodic re-audit trigger (see live gap log)
+- `22-procedure-incident-escalation.md` — incident-driven re-audit (see live gap log)
 - `30-template-dd-checklist.md` Section 03 — Security Risk checklist that consumes this report
 - `42-ai-agent-document-versioning.md` — versioned storage
 

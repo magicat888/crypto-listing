@@ -408,7 +408,7 @@ The dissemination of this Listing Document is **prohibited** until the Head of L
 - `00-legal-framework-hk-sfc.md` §7-§8 — disclosure and Schedule 2 requirements
 - HKbitEX Listing Rules Schedule 2 — Information Memorandum content (for Security Tokens)
 - HKbitEX TAP §5 — Listing Document content (this template mirrors it)
-- `20-procedure-token-admission.md` — when this document is required
+- `20-procedure-token-admission.md` — when this document is required (see live gap log)
 - `30-template-dd-checklist.md` — feeds the technical sections of this document
 - `32-template-smart-contract-dd.md` — feeds Section 8 (Security Measures)
 - `42-ai-agent-document-versioning.md` — versioned storage of this document

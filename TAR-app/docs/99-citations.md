@@ -5,9 +5,7 @@ classification: public
 
 # Citations — Public SFC Source Extracts
 
-> **Public version.** This file contains only SFC public regulatory text citations. HKbitEX-internal citations (CIT-HKX-LR-*, CIT-HKX-TAP-*) are kept in the **private** repository at `magicat888/crypto-listing-private` (file: `TAR-app/docs/99-citations.md`).
->
-> **Citation convention.** `[CIT-{source}-{n}]` resolves to the matching entry below.
+> **Public version.** SFC quotes only. HKbitEX-internal citations live in `magicat888/crypto-listing-private`.
 
 ---
 
@@ -184,8 +182,8 @@ classification: public
 
 ## F. HKbitEX internal citations (in private repo only)
 
-The HKbitEX Listing Rules v3.1 and Token Admission and Review Policies and Procedures v1.0 citations (`CIT-HKX-LR-*` and `CIT-HKX-TAP-*`) are kept in `magicat888/crypto-listing-private` because they quote internal HKbitEX governance documents. The full citation registry is available to authorised collaborators of that repo.
+HKbitEX Listing Rules v3.1 + TAP v1.0 citations (`CIT-HKX-LR-*` and `CIT-HKX-TAP-*`) are in `magicat888/crypto-listing-private`.
 
 ## G. Source documents (in private repo only)
 
-The HKbitEX-source extracts (`01-listing-rules-v3.1.md` through `07-review-of-information-sources-on-dd.md`) and the raw source files in `reference/HKbitEX/` are kept in `magicat888/crypto-listing-private` because they are HKbitEX-internal governance material.
+HKbitEX source extracts (`01-07`) and raw files (`reference/HKbitEX/`) are in `magicat888/crypto-listing-private`.

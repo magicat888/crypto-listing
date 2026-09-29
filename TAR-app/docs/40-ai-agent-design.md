@@ -223,13 +223,14 @@ Each specialist agent:
 
 ### 5.5 Discrepancy Resolution Agent
 
-| Aspect | Detail |
-|---|---|
-| **eve definition** | `agents/discrepancy/` |
-| **Skills** | Discrepancy classification (Methodology / Timing / Inclusion / Definition / Genuine Contradiction) per HKbitEX Review of Information Sources §3 |
-| **Tools** | Source validators; data-provenance tracker; cross-source reconciler |
-| **Outputs** | Discrepancy record; recommended resolution; impact assessment |
-| **Guardrails** | Cannot silently pick one source; cannot declare resolved without Head of Listing approval; cannot resolve regulatory-implication discrepancies without Legal review |
+| Aspect             | Detail                                                                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **eve definition** | `agents/discrepancy/`                                                                                                                                               |
+| **Skills**         | Discrepancy classification (Methodology / Timing / Inclusion / Definition / Genuine Contradiction) per HKbitEX Review of Information Sources §3                     |
+| **Tools**          | Source validators; data-provenance tracker; cross-source reconciler                                                                                                 |
+| **Outputs**        | Discrepancy record; recommended resolution; impact assessment                                                                                                       |
+| **Guardrails**     | Cannot silently pick one source; cannot declare resolved without Head of Listing approval; cannot resolve regulatory-implication discrepancies without Legal review |
+
 
 ### 5.6 Validation Agent (one of the three you asked for)
 
@@ -281,35 +282,50 @@ Implementation:
 
 ### 5.9 Gap Analysis Agent (the central feature you asked for)
 
-| Aspect | Detail |
-|---|---|
-| **eve definition** | `agents/gap-analysis/` |
-| **Trigger** | Continuous — runs on every agent action that uses a framework, score, label, or procedure |
-| **Skills** | Catalog of HKbitEX-approved frameworks (extracted from docs/02..07 + LR v3.1 + TAP v1.0); comparison logic |
-| **Tools** | HKbitEX corpus lookup; framework fingerprinting; gap-record writer |
-| **Outputs** | Gap record (gap ID; reference doc + section; framework description; HKbitEX source status; suggested action; status) |
-| **Workflow** | Routes gap record to gap-analysis module → manager review → accept/reject (see `41-…` §4) |
+| Aspect             | Detail                                                                                                               |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **eve definition** | `agents/gap-analysis/`                                                                                               |
+| **Trigger**        | Continuous — runs on every agent action that uses a framework, score, label, or procedure                            |
+| **Skills**         | Catalog of HKbitEX-approved frameworks (extracted from docs/02..07 + LR v3.1 + TAP v1.0); comparison logic           |
+| **Tools**          | HKbitEX corpus lookup; framework fingerprinting; gap-record writer                                                   |
+| **Outputs**        | Gap record (gap ID; reference doc + section; framework description; HKbitEX source status; suggested action; status) |
+| **Workflow**       | Routes gap record to gap-analysis module → manager review → accept/reject (see `41-…` §4)                            |
 
 #### 5.9.1 Pre-loaded gaps (seeded from policy docs)
 
-When TAR-app is first launched, the gap-analysis module is pre-populated with all gaps flagged in the policy/template docs:
+When TAR-app is first launched, the gap-analysis module is pre-populated with **85 gaps across 12 categories**. Each gap is a framework that TAR-app uses (or may use) that is **NOT present in HKbitEX's approved policies** (`docs/00-07`). The TAR-app gap-analysis workflow (see `41-…` §4) routes each gap to managers for review → accept (becomes HKbitEX policy via Board approval) or reject (framework removed).
 
-- GAP-COI-001..011 (10-policy-coi-register.md §12)
-- GAP-TARC-001..008 (11-policy-tarc-governance.md §11)
-- GAP-AUDIT-001..010 (12-policy-smart-contract-audit-vendor.md §12)
-- GAP-ADM-001..007 (20-procedure-token-admission.md §11)
-- GAP-SUS-001..006 (21-procedure-suspension-delisting.md §10)
-- GAP-INC-001..011 (22-procedure-incident-escalation.md §6)
-- GAP-MON-001..011 (23-procedure-ongoing-monitoring.md §6)
-- GAP-DDC-001..003 (30-template-dd-checklist.md §11)
-- GAP-MR-001..004 (31-template-monthly-report-hol.md §14)
-- GAP-SCD-001..007 (32-template-smart-contract-dd.md §10)
-- GAP-LD-001..005 (33-template-listing-document.md gap section)
-- GAP-IS-001..002 (14-policy-information-sources.md §4)
+**Full gap inventory:**
 
-Plus internal-contradiction flag:
+| Gap category | Count | HKbitEX anchor (what's actually in HKbitEX docs) |
+|---|---|---|
+| **GAP-COI-001..011** | 11 | HKbitEX TAP §2.3.5 + §4.1.6 + LR Chapter 3 (TARC member COI declaration + PAD + abstention counting toward quorum) |
+| **GAP-TARC-001..008** | 8 | HKbitEX TAP Appendix B (TARC Terms of Reference) + LR Chapter 3 |
+| **GAP-AUDIT-001..010** | 10 | HKbitEX TAP §3.4 + LR 2.2 (smart contract audit factor) |
+| **GAP-ADM-001..007** | 7 | HKbitEX TAP §3-§5 + LR Chapter 6 (admission procedure) |
+| **GAP-SUS-001..006** | 6 | HKbitEX LR 8 + TAP §7 (halt/suspension/delisting procedure) |
+| **GAP-INC-001..011** | 11 | HKbitEX LR 8.1 + TAP §6.3.4 + §7.2 + §8.5 (incident escalation fragments) |
+| **GAP-MON-001..011** | 11 | HKbitEX TAP §6.3 (daily + monthly monitoring) |
+| **GAP-DDC-001..003** | 3 | HKbitEX TAP §3 + Retail Appendix 2 (DD structure) — see `30-template-dd-checklist.md` §11 |
+| **GAP-MR-001..004** | 4 | HKbitEX TAP Appendix D + 4010 (monthly report structure) — see `31-template-monthly-report-hol.md` §14 |
+| **GAP-SCD-001..007** | 7 | HKbitEX TAP §3.4 (audit acceptance) — see `32-template-smart-contract-dd.md` §10 |
+| **GAP-LD-001..005** | 5 | HKbitEX TAP §5 + Schedule 2 (listing document structure) — see `33-template-listing-document.md` gap section |
+| **GAP-IS-001..002** | 2 | HKbitEX Review of Information Sources §2 (criteria) — see live gap log (TAR-app runtime) |
+| **Total** | **85** | |
 
-- **GAP-PI-001**: HKbitEX TAP §4.1.3 (PI-only admission) vs the 4010 monthly report listing BTC/ETH as "Professional + Retail". Resolution needed (amend one or the other). High priority — affects every monthly report and admission classification.
+Each individual gap ID is detailed in the per-doc gap addenda at the end of the relevant `docs/` file (where applicable — `30`, `31`, `32`, `33` currently host their own; others live in the TAR-app gap log at runtime in MongoDB Atlas).
+
+**Internal contradiction (separate from framework gaps):**
+
+- **GAP-PI-001** (HIGH PRIORITY): HKbitEX TAP §4.1.3 states that the Platform admits VAs "which apply to PI Client only" (i.e., PI-only admission). The 4010 monthly report (`docs/03-…`) lists BTC and ETH as available to "Professional + Retail" (i.e., retail access). Either the policy is wrong or the operational listing was unauthorised. This contradiction:
+  - Affects every monthly report (`31-…`)
+  - Affects admission classification at every admission
+  - Affects the retail/PI gating policy (which itself is a gap since HKbitEX has no standalone retail/PI gating doc — only TAP §4.1.3's PI-only admission rule)
+  - **Action required:** resolve before TAR-app gap-analysis workflow is built, since the gap-analysis module cannot reconcile a contradiction in HKbitEX's own docs.
+
+**Why a gap log and not an inline section per doc:**
+
+TAR-app's gap log is the **single source of truth** for all framework gaps. It is updated continuously by the Gap Analysis Agent (§5.9). Per-doc gap tables (e.g., `30-template-dd-checklist.md` §11) are **static snapshots** that ship with each doc version; the live gap log in MongoDB Atlas always has the latest state. Managers and the Head of Listing reconcile the two at every policy-doc revision.
 
 #### 5.9.2 Continuous gap detection
 

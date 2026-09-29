@@ -51,35 +51,153 @@ This section summarises selected admission workflows; full detail in the per-doc
 
 ### 2.1 Intake & triage
 
-| Field | Detail |
+| Field                | Detail                                                                  |
+| -------------------- | ----------------------------------------------------------------------- |
+| **Trigger**          | Email / portal / API submission                                         |
+| **Agents**           | Intake Agent                                                            |
+| **Human checkpoint** | Case Officer assignment                                                 |
+| **HKbitEX anchor**   | HKbitEX TAP §4.1; LR 6.1                                                |
+| **Artefacts**        | Application Reference; preliminary eligibility memo; case file skeleton |
+
+### 2.2 Application log + COI gate
+
+> **HKbitEX-strict design.** HKbitEX does NOT have a standalone Conflict-of-Interest policy. The following is a TAR-app design extension. It enforces HKbitEX's three COI rules (TAP §2.3.5, §4.1.6, LR Chapter 3) plus a structured declaration workflow (Form COI-001 + 7-day pre-meeting distribution + Legal review + Head of Listing sign-off). The structured extension is listed in the gap inventory (GAP-COI-001..011 — see `40-…` §5.9.1) and requires Board approval before becoming HKbitEX policy.
+
+| Field                | Detail                                                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Trigger**          | Application Reference assigned + full application package received                                                 |
+| **Agents**           | Intake Agent (orchestrates); Distribution sub-agent (Form COI-001 dispatch); Collection sub-agent                   |
+| **Human checkpoint** | Head of Listing confirms gate cleared before DD begins                                                           |
+| **HKbitEX anchor**   | HKbitEX TAP §2.3.5 (TARC COI declarations); TAP §4.1.6 (PAD); LR Chapter 3 (abstention counts toward quorum)      |
+| **Artefacts**        | Application package; distributed Form COI-001; signed declarations; Legal review note; gate-cleared flag           |
+| **Guardrails**       | DD cannot begin until gate cleared; recused member still counts toward quorum; PAD trades pre-cleared by Compliance |
+
+#### 2.2.1 What HKbitEX requires (the floor)
+
+Three rules from HKbitEX source docs that TAR-app enforces unconditionally:
+
+| Rule | Source | TAR-app enforcement |
+|---|---|---|
+| TARC members must declare interests and abstain from approval of admissions in which they have a vested interest | HKbitEX TAP §2.3.5 | Form COI-001 distributed + collected; conflicts flagged; recused members tracked |
+| "Insiders" involved in listing process are prohibited from trading in the VA, or advising others to trade | HKbitEX TAP §4.1.6 | PAD pre-clearance for all listed persons; automatic block on trades without pre-clearance |
+| TARC member recusal from voting — but the recused member still counts toward quorum | HKbitEX LR Chapter 3 | Quorum check uses total attendance minus only those absent; abstention ≠ absence |
+
+#### 2.2.2 The structured declaration workflow (design extension, GAP-COI-001..011)
+
+```
+[Application Reference assigned]
+   │
+   ▼
+[Intake Agent: distribute Form COI-001]
+   │   Recipients: all covered persons (TARC members + observers + Case Officer
+   │   + Listing staff + External advisors + Compliance + Risk staff)
+   │   Form fields: financial interest; personal relationship; professional relationship;
+   │                commercial arrangement; prior involvement; attestation; reviewer section
+   │   Deadline: 1 Business Day post-application-log
+   │
+   ▼
+[Covered persons submit signed declarations]
+   │   Deadline: 7 calendar days before TARC meeting (per workflow design; pending Board approval)
+   │
+   ▼
+[Legal reviews declarations]
+   │   - Verify completeness
+   │   - Flag any potential conflicts (financial, personal, professional, other)
+   │   - Determine: no_conflict / manageable / recuse / escalate_to_CCO
+   │
+   ▼
+[Case Officer + Head of Listing confirm gate status]
+   │   - If all clear: gate = "cleared" → DD can begin
+   │   - If any recuse: record recusal; recused member still counts toward quorum
+   │   - If escalate: route to CCO for final determination; pause DD until resolved
+   │
+   ▼
+[Gate state committed to case file (versioned, tamper-evident)]
+```
+
+#### 2.2.3 Personal Account Dealing (PAD) integration
+
+Per HKbitEX TAP §4.1.6, "insiders" (anyone with access to non-public admission information) are prohibited from trading in the VA. TAR-app enforces this through:
+
+| TAR-app mechanism | Detail |
 |---|---|
-| **Trigger** | Email / portal / API submission |
-| **Agents** | Intake Agent |
-| **Human checkpoint** | Case Officer assignment |
-| **HKbitEX anchor** | HKbitEX TAP §4.1; LR 6.1 |
-| **Artefacts** | Application Reference; preliminary eligibility memo; case file skeleton |
+| **Insider registry** | Auto-populated when access is granted to case files, meeting packs, or application materials |
+| **Pre-clearance gate** | Any PAD trade by a registered insider requires Compliance pre-clearance before execution; the trading system blocks unapproved trades |
+| **Restricted period** | From application log date through 5 Business Days after public announcement of decision |
+| **Restricted activities** | Trading the VA; advising others to trade the VA; disclosing non-public information |
+| **Audit log** | Every pre-clearance request, approval/denial, and trade recorded; reviewed quarterly |
 
-### 2.2 DD execution (6 sections in parallel, per HKbitEX TAP §3.3)
+#### 2.2.4 Recusal handling (HKbitEX LR Chapter 3)
 
-| Field | Detail |
-|---|---|
-| **Trigger** | Structured data available; all source attributions in place |
-| **Agents** | 6 DD Analyst Agents (parallel) + Smart Contract Audit Agent + Validation Agent |
-| **Human checkpoint** | Each agent's output reviewed by the corresponding team lead per TAP §3.3 |
-| **HKbitEX anchor** | TAP §3.2 (16-18 DD criteria); TAP §3.3 (per-department-head responsibilities) |
-| **Artefacts** | 6 DD section reports; 1 smart-contract DD report; 1 validation report |
-| **Guardrails** | No item marked Verified without source_url + access_date + verification_method; no silent discrepancy resolution |
+When a TARC member has a conflict:
 
-### 2.3 Recommendation synthesis + Head of Listing review
+| Step | Action | Per HKbitEX source |
+|---|---|---|
+| 1 | Member declares interest on Form COI-001 | TAP §2.3.5 |
+| 2 | Legal + Head of Listing determine: recuse | (TAR-app design extension; HKbitEX silent on specific process) |
+| 3 | Recused member **does NOT vote** on the case | LR Chapter 3 |
+| 4 | Recused member **IS counted** toward quorum | LR Chapter 3 |
+| 5 | Recused member **does NOT receive** the meeting pack | (TAR-app design extension; HKbitEX silent) |
+| 6 | Recusal logged in case file; surfaced in next quarterly COI report | TAP §2.3.6 implied |
 
-| Field | Detail |
-|---|---|
-| **Trigger** | All 6 DD sections + smart-contract report + validation report complete |
-| **Agents** | Recommendation Synthesiser |
-| **Human checkpoint** | Head of Listing review (HKbitEX TAP §4.2.5) |
-| **Artefacts** | DD report per `30-template-dd-checklist.md` |
+#### 2.2.5 Confidentiality and retention
 
-### 2.4 TARC meeting pack preparation (HKbitEX LR Chapter 3)
+- All declarations and supporting documents are **strictly confidential** (Legal Department access only)
+- Breach of confidentiality by a covered person is itself a COI matter
+- **Retention: 7 years minimum** (consistent with HKbitEX record-keeping per TAP §10)
+- Stored in TAR-app tamper-evident log (per `42-…`)
+
+#### 2.2.6 Quarterly + annual re-attestation
+
+Beyond case-level declarations:
+
+| Cadence | Trigger | Action |
+|---|---|---|
+| **Quarterly** | Routine monitoring cycle | All TARC members + supporting staff re-attest no material change in COI status |
+| **Annual** | Annual policy review | All covered persons complete full Form COI-001 from scratch |
+| **On role change** | New hire, role change, or new assignment to a case | Affected person completes Form COI-001 within 5 Business Days |
+| **Material change** | New investment, new family relationship, new outside role | Affected person updates Form COI-001 within 1 Business Day |
+
+#### 2.2.7 Reporting
+
+| Frequency | Recipient | Content |
+|---|---|---|
+| Per case | TARC, Board | Aggregate count of declarations, recusals, conflict types (anonymised) |
+| Quarterly | Head of Listing → TARC → Board | Aggregate statistics; flags for repeated patterns |
+| Annual | Board | Full policy review; list of changes; refresher-training compliance |
+
+#### 2.2.8 Enforcement
+
+Breach of this workflow may result in:
+
+- Disciplinary action per HR policy
+- Removal from Listing Department / TARC
+- Referral to SFC if the breach affects regulatory obligations
+- PAD breach = immediate Compliance review + potential removal from insider list
+
+---
+
+### 2.3 DD execution (6 sections in parallel, per HKbitEX TAP §3.3)
+
+| Field                | Detail                                                                                                           |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Trigger**          | Structured data available; all source attributions in place                                                      |
+| **Agents**           | 6 DD Analyst Agents (parallel) + Smart Contract Audit Agent + Validation Agent                                   |
+| **Human checkpoint** | Each agent's output reviewed by the corresponding team lead per TAP §3.3                                         |
+| **HKbitEX anchor**   | TAP §3.2 (16-18 DD criteria); TAP §3.3 (per-department-head responsibilities)                                    |
+| **Artefacts**        | 6 DD section reports; 1 smart-contract DD report; 1 validation report                                            |
+| **Guardrails**       | No item marked Verified without source_url + access_date + verification_method; no silent discrepancy resolution |
+
+### 2.4 Recommendation synthesis + Head of Listing review
+
+| Field                | Detail                                                                 |
+| -------------------- | ---------------------------------------------------------------------- |
+| **Trigger**          | All 6 DD sections + smart-contract report + validation report complete |
+| **Agents**           | Recommendation Synthesiser                                             |
+| **Human checkpoint** | Head of Listing review (HKbitEX TAP §4.2.5)                            |
+| **Artefacts**        | DD report per `30-template-dd-checklist.md`                            |
+
+### 2.5 TARC meeting pack preparation (HKbitEX LR Chapter 3)
 
 | Field | Detail |
 |---|---|
@@ -203,7 +321,7 @@ supersedes_policy_version: { pointer }   # if Accepted + replaces existing
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  GAP-MON-002 — Monitoring                                                 │
-│  Reference: 23-procedure-ongoing-monitoring.md §1.2 (added by Monitoring)   │
+│  Reference: live gap log (see `40-…` §5.9.1 — added by Monitoring)    │
 │  Framework: "4-pillar weighted scoring (Regulatory 40% / Security 30% /     │
 │             Market 20% / Governance 10%) with 1–5 scale"                   │
 │  HKbitEX source status: Not in HKbitEX docs                                │
