@@ -327,9 +327,30 @@ Each individual gap ID is detailed in the per-doc gap addenda at the end of the 
 
 TAR-app's gap log is the **single source of truth** for all framework gaps. It is updated continuously by the Gap Analysis Agent (§5.9). Per-doc gap tables (e.g., `30-template-dd-checklist.md` §11) are **static snapshots** that ship with each doc version; the live gap log in MongoDB Atlas always has the latest state. Managers and the Head of Listing reconcile the two at every policy-doc revision.
 
-#### 5.9.2 Continuous gap detection
+#### 5.9.2 Trigger model (multi-trigger, not single-trigger)
 
-Every agent action that uses a framework not in the HKbitEX-approved list triggers:
+The Gap Analysis Agent runs on **five distinct triggers**. Each catches a different class of gap; together they cover the full surface area.
+
+| # | Trigger | What it catches | Source of trigger | When it runs |
+|---|---|---|---|---|
+| 1 | **Continuous (per agent action)** | New framework introduced by code change or new agent capability | Auto (eve.dev hook) | Every time any TAR-app agent invokes a framework |
+| 2 | **Regulatory change** | SFC VATP Guidelines revision; new SFC circular; SFO/AMLO amendment; licensing-condition variation | SFC scraper + HKbitEX Legal team | On detection of any regulatory text change |
+| 3 | **HKbitEX internal policy change** | Listing Rules / TAP / Appendix 3 / Review of Information Sources / other HKbitEX docs updated | Head of Listing (or delegated) signals via TAR-app | On commit to private repo / explicit trigger |
+| 4 | **Case-event** | New admission application, TARC decision (especially overturn), material event surfaced | Case lifecycle | On each case state transition |
+| 5 | **Periodic scheduled** | Drift, accumulated gaps, internal contradiction re-check | TAR-app scheduler | Quarterly (lightweight) + annual (comprehensive) |
+| 6 | **Manual** | Ad-hoc manager-initiated review of a specific framework / doc area | Manager via TAR-app UI | On demand |
+
+Any one trigger alone misses things:
+
+- **Manual only** → framework drift accumulates silently; no-one remembers to check
+- **Regulatory change only** → misses internal HKbitEX policy drift and new agent capabilities
+- **Continuous only** → too noisy; slow on every agent action; misses "missing entirely" frameworks (agent never invokes them)
+
+The five triggers together cover all four gap-creation vectors.
+
+##### 5.9.2.1 Trigger 1 — Continuous (per agent action)
+
+Every agent action that uses a framework not in the HKbitEX-approved list triggers a gap record:
 
 ```
 on agent_action(framework):
@@ -342,10 +363,109 @@ on agent_action(framework):
             reference_section=current_section,
             framework=framework,
             hkbitex_source_status="Not in HKbitEX docs",
-            suggested_action="Manager review via TAR-app gap-analysis"
+            suggested_action="Manager review via TAR-app gap-analysis",
+            trigger_source="continuous"
         )
         proceed (with framework flagged as advisory)
 ```
+
+**Performance guardrail:** the HKbitEX-approved framework lookup uses a Bloom filter backed by the versioned corpus, so per-action lookup is < 1ms.
+
+##### 5.9.2.2 Trigger 2 — Regulatory change
+
+Sources of regulatory text change that TAR-app monitors:
+
+| Source | Method | Cadence |
+|---|---|---|
+| SFC VATP Guidelines page | Hash check + content diff | Daily |
+| SFC circulars page | Hash check + content diff | Daily |
+| SFO / AMLO / C(WUMP)O amendments | HKbitEX Legal team publishes updates to TAR-app | On receipt |
+| HKbitEX licensing-condition variations | Head of Listing publishes via TAR-app | On variation |
+| Stablecoins Ordinance updates | HKbitEX Legal team | On receipt |
+
+On detecting a change:
+
+```
+on regulatory_text_changed(source, old_version, new_version):
+    trigger_id = hash(source + new_version)
+    affected_sections = diff_extract_affected_sections(old_version, new_version)
+    for each affected_section:
+        emit_gap_record(
+            gap_id=f"GAP-REG-{trigger_id}-{seq}",
+            reference_doc=source,
+            reference_section=affected_section,
+            framework="Updated SFC / HKbitEX regulatory text",
+            hkbitex_source_status="Updated",
+            suggested_action="Re-run gap analysis; flag any new framework divergence",
+            trigger_source="regulatory_change"
+        )
+    notify Head of Listing + Compliance via Slack/email
+```
+
+##### 5.9.2.3 Trigger 3 — HKbitEX internal policy change
+
+When HKbitEX updates an internal policy (LR v3.1, TAP v1.0, monthly report template, etc.), the change is reflected in the private repo first; TAR-app detects the change via:
+
+- Git webhook on the private repo (push event)
+- OR explicit signal from Head of Listing via TAR-app UI
+
+On detection:
+
+```
+on hkbitex_policy_changed(doc, old_version, new_version):
+    # Re-evaluate all gaps that reference this doc
+    affected_gaps = gap_log.find({reference_doc: doc})
+    for each gap in affected_gaps:
+        if new_version resolves gap:
+            gap.status = "POTENTIALLY_RESOLVED"
+            gap.resolved_by_version = new_version
+            notify_manager(gap)
+        else:
+            gap.framework_version_at_last_check = new_version
+            gap.status = "RECHECK_NEEDED"
+            notify_manager(gap)
+    # Emit new gaps for any new framework introduced by the doc update
+    new_frameworks = extract_frameworks(new_version) - extract_frameworks(old_version)
+    for each new_framework in new_frameworks:
+        emit_gap_record(
+            gap_id=auto,
+            reference_doc=doc,
+            reference_section=...,
+            framework=new_framework,
+            hkbitex_source_status="Newly added in HKbitEX policy update",
+            suggested_action="Review",
+            trigger_source="policy_change"
+        )
+```
+
+##### 5.9.2.4 Trigger 4 — Case-event
+
+Case-lifecycle events that may surface gaps:
+
+| Event | Action |
+|---|---|
+| New admission application logged | Run gap analysis on the specific applicant/asset area (e.g., "stablecoin admission") |
+| TARC vote (any outcome) | If vote is a rejection or significant override, flag as potential framework gap |
+| Material event in monitoring | If the response required a framework not in HKbitEX docs, emit gap record |
+| Discrepancy Agent flags Class E (genuine contradiction) | Emit gap record (the contradiction may indicate a policy gap) |
+
+##### 5.9.2.5 Trigger 5 — Periodic scheduled
+
+| Cadence | Scope | Purpose |
+|---|---|---|
+| **Quarterly** | All 85 pre-loaded gaps + any new gaps since last review | Catch framework drift; refresh gap status |
+| **Annual** | Comprehensive re-audit + SFC + HKbitEX policy corpus re-fingerprint | Annual policy review per [CIT-SFC-G-001(e)] + HKbitEX TAP §2.3.1(e) |
+
+##### 5.9.2.6 Trigger 6 — Manual
+
+Any user with the **Manager** role or higher can trigger gap analysis on demand:
+
+- **By document**: re-scan `docs/02-07` against current TAR-app behaviour
+- **By framework**: re-scan all usages of a specific framework (e.g., "all uses of ST Label system")
+- **By case**: re-scan a specific case file
+- **By category**: e.g., "re-scan all GAP-COI-* gaps"
+
+Manual triggers are logged; outputs go through the standard gap-analysis workflow (review → accept/reject).
 
 ### 5.10 Monitoring Agents (post-listing per HKbitEX TAP §6.3)
 

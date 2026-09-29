@@ -182,8 +182,8 @@ classification: public
 
 ## F. HKbitEX internal citations (in private repo only)
 
-HKbitEX Listing Rules v3.1 + TAP v1.0 citations (`CIT-HKX-LR-*` and `CIT-HKX-TAP-*`) are in `magicat888/crypto-listing-private`.
+HKbitEX Listing Rules v3.1 + TAP v1.0 citations live in `magicat888/crypto-listing-private`.
 
 ## G. Source documents (in private repo only)
 
-HKbitEX source extracts (`01-07`) and raw files (`reference/HKbitEX/`) are in `magicat888/crypto-listing-private`.
+HKbitEX source extracts and raw files live in `magicat888/crypto-listing-private`.

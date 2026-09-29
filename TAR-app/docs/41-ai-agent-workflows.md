@@ -243,9 +243,22 @@ on monthly_cron:
 
 The gap-analysis module surfaces every instance where TAR-app uses a framework that is **not present in HKbitEX's currently approved policies**. Manager reviews and either accepts (proceeds to Board approval → becomes HKbitEX policy) or rejects (framework removed from TAR-app behaviour).
 
-### 4.2 Gap detection (continuous)
+### 4.2 Gap detection (multi-trigger)
 
-Every agent action passes through the Gap Analysis Agent (`40-…` §5.9). On detecting a non-HKbitEX framework:
+Gap detection is **not** single-trigger. The Gap Analysis Agent runs on **six triggers** (full detail in `40-…` §5.9.2):
+
+| # | Trigger | What it catches |
+|---|---|---|
+| 1 | **Continuous** (every agent action) | New framework introduced by code change or new agent capability |
+| 2 | **Regulatory change** | SFC VATP Guidelines revision; new SFC circular; SFO/AMLO amendment; licensing-condition variation |
+| 3 | **HKbitEX internal policy change** | LR v3.1 / TAP v1.0 / Appendix 3 / Review of Information Sources / other HKbitEX docs updated |
+| 4 | **Case-event** | New admission application, TARC decision (especially overturn), material event surfaced |
+| 5 | **Periodic scheduled** | Quarterly (lightweight) + annual (comprehensive) re-audit |
+| 6 | **Manual** | Manager-initiated ad-hoc review of a specific framework / doc area |
+
+Any one trigger alone misses things. The six together cover all gap-creation vectors.
+
+**Primary trigger: continuous** — every agent action passes through the Gap Analysis Agent:
 
 ```python
 def on_agent_action(framework: str, doc: str, section: str):
@@ -258,7 +271,8 @@ def on_agent_action(framework: str, doc: str, section: str):
             reference_section=section,
             framework=framework,
             hkbitex_source_status="Not in HKbitEX docs",
-            suggested_action="Manager review via TAR-app gap-analysis"
+            suggested_action="Manager review via TAR-app gap-analysis",
+            trigger_source="continuous"
         )
         proceed  # but framework is flagged as advisory
 ```

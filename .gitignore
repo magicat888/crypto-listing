@@ -9,6 +9,12 @@ Thumbs.db
 *.swp
 *.swo
 
+# Microsoft Office temp/lock files (~$ prefix)
+~*.docx
+~*.xlsx
+~*.pptx
+*.tmp
+
 # Python
 __pycache__/
 *.py[cod]

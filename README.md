@@ -10,17 +10,17 @@
 
 | Feature | Detail |
 |---|---|
-| **Gap-analysis workflow** | Surfaces every use of a framework NOT in HKbitEX's approved policies; routes to manager review → accept (becomes policy) / reject (removed). 85 gaps pre-loaded. |
+| **Gap-analysis workflow** | Surfaces every use of a framework NOT in HKbitEX's approved policies; routes to manager review → accept (becomes policy) / reject (removed). 85 gaps pre-loaded. Triggered by 6 sources (continuous + regulatory change + HKbitEX policy change + case-event + periodic + manual). |
 | **Staging version control** | Word-style "track changes + accept/reject" applied programmatically to every artefact, with named approvers and tamper-evident audit log. |
-| **Validation agent with weblinks** | Every DD report claim gets a clickable weblink to a permanent versioned snapshot of the source — for easy human verification. |
+| **Validation agent with weblinks** | Every DD report claim gets a clickable weblink to a permanent versioned snapshot of the source. |
 
-## Architecture (high-level)
+## Architecture
 
 - **Agent framework:** [eve.dev](https://eve.dev) (durable AI agents)
 - **LLM backend:** MiniMax
 - **Frontend:** Next.js + Tailwind + shadcn/ui on Vercel
 - **Data:** MongoDB Atlas + Pinecone (vectors) + S3 (versioned snapshots)
-- **Auth:** Corporate SSO (single-tenant HKbitEX)
+- **Auth:** Corporate SSO
 
 See `TAR-app/docs/40-ai-agent-design.md` for full architecture.
 
@@ -28,15 +28,15 @@ See `TAR-app/docs/40-ai-agent-design.md` for full architecture.
 
 | Category | In this repo? | Sibling repo? |
 |---|---|---|
-| **i. SFC + Laws** (public regulatory text) | ✅ | n/a |
-| **ii. HKbitEX Policies** (internal governance) | ❌ | ✅ Private |
-| **iii. Working Templates** (DD + reporting) | ✅ | n/a |
+| **i. SFC + Laws** | ✅ | n/a |
+| **ii. HKbitEX Policies** | ❌ | ✅ Private |
+| **iii. Working Templates** | ✅ | n/a |
 | **system** (TAR-app architecture) | ✅ | n/a |
 
 ## Reading order
 
-1. `TAR-app/docs/00-legal-framework-hk-sfc.md` — what SFC requires
-2. `TAR-app/docs/40-ai-agent-design.md` — TAR-app architecture
+1. `TAR-app/docs/00-legal-framework-hk-sfc.md` — SFC requirements
+2. `TAR-app/docs/40-ai-agent-design.md` — architecture + gap-analysis 6-trigger model
 3. `TAR-app/docs/41-ai-agent-workflows.md` — workflows (gap-analysis in §4; COI gate in §2.2; validation agent in §6)
 4. `TAR-app/docs/42-ai-agent-document-versioning.md` — staging + accept/reject flow
 5. `TAR-app/docs/30-…` through `33-…` — working templates
@@ -48,10 +48,6 @@ See `TAR-app/docs/40-ai-agent-design.md` for full architecture.
 - ✅ Templates + system design + COI gate workflow (this repo)
 - ⏳ Implementation: **pending approval of the system design**
 
-## License
-
-TBD by HKbitEX.
-
 ## Related
 
-- Private repo with HKbitEX-internal extracts: [`magicat888/crypto-listing-private`](https://github.com/magicat888/crypto-listing-private)
+- Private repo: [`magicat888/crypto-listing-private`](https://github.com/magicat888/crypto-listing-private)
